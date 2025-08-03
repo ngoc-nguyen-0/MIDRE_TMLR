@@ -1,4 +1,7 @@
 # Random Erasing vs. Model Inversion: A Promising Defense or a False Hope? (TMLR 2025)
+Viet-Hung Tran, Ngoc-Bao Nguyen, Son T. Mai, Hans Vandierendonck, Ira Assent, Alex Kot, Ngai-Man Cheung
+
+(*) The first two authors contributed equally.
   <center>
   <img src="images/figure2.jpg" alt="PPA Examples"  height=1000>
   </center>
