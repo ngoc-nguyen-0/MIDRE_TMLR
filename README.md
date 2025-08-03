@@ -1,6 +1,6 @@
 # Random Erasing vs. Model Inversion: A Promising Defense or a False Hope? (TMLR 2025)
   <center>
-  <img src="images/figure2.jpg" alt="PPA Examples"  height=260>
+  <img src="images/figure2.jpg" alt="PPA Examples"  height=1000>
   </center>
 
 > **Abstract:**
