@@ -37,7 +37,7 @@ wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl 
 
 ## Prepare Datasets
 We support [FaceScrub](http://vintage.winklerbros.net/facescrub.html), [CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and [Stanford Dogs](http://vision.stanford.edu/aditya86/ImageNetDogs/) as datasets to train the target models. Please follow the instructions on the websites to download the datasets. 
-Replace the ```root``` of dataset in  ```datasets/facescrub.py```
+Replace the ```root``` of dataset, for examples  ```datasets/facescrub.py```
 Make sure that the following structure is kept:
 
   
