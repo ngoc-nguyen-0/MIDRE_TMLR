@@ -144,8 +144,8 @@ def main():
 
     # Log initial vectors
     if config.logging:
-        Path("results").mkdir(parents=True, exist_ok=True)
-        init_w_path = f"results/init_w_{run_id}.pt"
+        Path(f"{results_fol}).mkdir(parents=True, exist_ok=True)
+        init_w_path = f"{results_fol}/{config.wandb['wandb_init_args']['name']}/init_w_{run_id}.pt"
         torch.save(w.detach(), init_w_path)
         wandb.save(init_w_path)
 
@@ -197,7 +197,7 @@ def main():
 
     # Log optimized vectors
     if config.logging:
-        optimized_w_path = f"results/optimized_w_{run_id}.pt"
+        optimized_w_path = f"{results_fol}/{config.wandb['wandb_init_args']['name']}/optimized_w_{run_id}.pt"
         torch.save(w_optimized_unselected.detach(), optimized_w_path)
         wandb.save(optimized_w_path)
 
@@ -229,7 +229,7 @@ def main():
 
     # Log selected vectors
     if config.logging:
-        optimized_w_path_selected = f"results/optimized_w_selected_{run_id}.pt"
+        optimized_w_path_selected = f"{results_fol}/{config.wandb['wandb_init_args']['name']}/optimized_w_selected_{run_id}.pt"
         torch.save(final_w.detach(), optimized_w_path_selected)
         wandb.save(optimized_w_path_selected)
         wandb.config.update({'w_path': optimized_w_path})
@@ -259,7 +259,7 @@ def main():
         if config.logging:
             try:
                 filename_precision = write_precision_list(
-                    f'results/precision_list_unfiltered_{run_id}',
+                    f'{results_fol}/{config.wandb['wandb_init_args']['name']}/precision_list_unfiltered_{run_id}',
                     precision_list)
                 wandb.save(filename_precision)
             except:
@@ -281,7 +281,7 @@ def main():
                 rtpt=rtpt)
             if config.logging:
                 filename_precision = write_precision_list(
-                    f'results/precision_list_filtered_{run_id}',
+                    f'{results_fol}/{config.wandb['wandb_init_args']['name']}/precision_list_filtered_{run_id}',
                     precision_list)
                 wandb.save(filename_precision)
 
@@ -323,7 +323,7 @@ def main():
         if config.logging:
             try:
                 filename_distance = write_precision_list(
-                    f'results/distance_inceptionv3_list_filtered_{run_id}',
+                    f'{results_fol}/{config.wandb['wandb_init_args']['name']}/distance_inceptionv3_list_filtered_{run_id}',
                     mean_distances_list)
                 wandb.save(filename_distance)
             except:
@@ -352,7 +352,7 @@ def main():
                 rtpt=rtpt)
             if config.logging:
                 filename_distance = write_precision_list(
-                    f'results/distance_facenet_list_filtered_{run_id}',
+                    f'{results_fol}/{config.wandb['wandb_init_args']['name']}/distance_facenet_list_filtered_{run_id}',
                     mean_distances_list)
                 wandb.save(filename_distance)
 
