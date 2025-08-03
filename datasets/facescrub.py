@@ -12,7 +12,7 @@ class FaceScrub(Dataset):
                  split_seed=42,
                  transform=None,
                  cropped=True,
-                 root='/home/ngocntb/facescrub'):
+                 root='data/facescrub'):
 
         if group == 'actors':
             if cropped:
@@ -61,11 +61,6 @@ class FaceScrub(Dataset):
                 for t in dataset_actresses.targets
             ]
             self.name = 'facescrub_all'
-
-            # print('self.class_to_idx',self.class_to_idx)
-            # import torch
-            # torch.save({'class_to_idx':self.class_to_idx}, "facescrub_class_to_idx.pt")
-            # exit()
 
         else:
             raise ValueError(

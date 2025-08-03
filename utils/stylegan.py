@@ -44,23 +44,6 @@ def save_images(imgs: torch.tensor, folder, filename, center_crop=800):
         torchvision.utils.save_image(img, path)
 
 
-def save_images_2(imgs: torch.tensor, folder, filename, center_crop=800):
-    """Save StyleGAN output images in file(s).
-
-    Args:
-        imgs (torch.tensor): generated images in [-1, 1] range
-        folder (str): output folder
-        filename (str): name of the files
-    """
-    imgs = imgs.detach()
-    if center_crop:
-        imgs = F.center_crop(imgs, (center_crop, center_crop))
-    imgs = (imgs * 0.5 + 128 / 255).clamp(0, 1)
-    for i, img in enumerate(imgs):
-        path = os.path.join(folder, f'{i}_{filename}.png')
-        torchvision.utils.save_image(img, path)
-
-
 def create_image(w,
                  generator,
                  crop_size=None,

@@ -44,7 +44,7 @@ def find_initial_w(generator,
     c = None
     target_model.eval()
     five_crop = None
-    # print('batch_size:', batch_size)
+
     with torch.no_grad():
         confidences = []
         final_candidates = []
@@ -57,13 +57,9 @@ def find_initial_w(generator,
         for w in tqdm(torch.utils.data.DataLoader(candidate_dataset,
                                                   batch_size=batch_size),
                       desc='Find initial style vector w'):
-            # print('w shape:', w[0].shape)
-            
             imgs = generator.synthesis(w[0],
                                        noise_mode='const',
                                        force_fp32=True)
-            # print('imgs shape:', imgs.shape)
-            # exit()
             # Adjust images and perform augmentation
             if clip:
                 lower_bound = torch.tensor(-1.0).float().to(imgs.device)
@@ -83,19 +79,14 @@ def find_initial_w(generator,
                 imgs = cropped_images
 
             target_conf = None
-            # print('imgs shape:', len(imgs))
-            
             for im in imgs:
                 if target_conf is not None:
                     target_conf += target_model(im).softmax(dim=1) / len(imgs)
                 else:
                     target_conf = target_model(im).softmax(dim=1) / len(imgs)
-            # print('target_conf shape:', target_conf.shape)
             confidences.append(target_conf)
 
         confidences = torch.cat(confidences, dim=0)
-        # print('Confidences shape:', confidences.shape)
-        # exit()
         for target in targets:
             sorted_conf, sorted_idx = confidences[:,
                                                   target].sort(descending=True)

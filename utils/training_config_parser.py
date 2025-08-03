@@ -14,9 +14,8 @@ from datasets.custom_subset import Subset
 from datasets.facescrub import FaceScrub
 from datasets.stanford_dogs import StanfordDogs
 from utils.datasets import get_normalization
-from functools import partial
-import torch
-import random
+
+
 class TrainingConfigParser:
 
     def __init__(self, config_file):
@@ -28,8 +27,6 @@ class TrainingConfigParser:
         model_config = self._config['model']
         print(model_config)
         model = Classifier(**model_config)
-        # print('model',model)
-        # exit()
         return model
 
     def create_datasets(self):
@@ -116,70 +113,6 @@ class TrainingConfigParser:
             f'Transformations during training: {train_set.transform}\n',
             f'Transformations during evaluation: {test_set.transform}')
         return train_set, valid_set, test_set
-    
-    def bandpass_filter_old(bx, cutoff_freq_range, lowpass=True):
-        assert cutoff_freq[0] >= 0 and cutoff_freq[0] <= 1, "cutoff must be in [0, 1]"
-        assert cutoff_freq[1] >= 0 and cutoff_freq[1] <= 1, "cutoff must be in [0, 1]"
-        fft = torch.fft.fftshift(torch.fft.fft2(bx))
-        if cutoff_freq_range[0]==cutoff_freq_range[1]:
-            cutoff_freq = cutoff_freq_range[0]
-        else:
-            cutoff_freq = random.uniform(cutoff_freq_range[0], cutoff_freq_range[1])
-        if not lowpass:
-            cutoff_freq = 1 - cutoff_freq
-        
-        h, w = fft.shape[-2:]  # height and width
-        cy, cx = h // 2, w // 2  # center y, center x
-        ry, rx = int(cutoff_freq * cy), int(cutoff_freq * cx)
-        
-        if lowpass:
-            mask = torch.zeros_like(fft)
-            mask[:, cy-ry:cy+ry, cx-rx:cx+rx] = 1
-        else:
-            mask = torch.ones_like(fft)
-            mask[:, cy-ry:cy+ry, cx-rx:cx+rx] = 0
-
-
-        fft = torch.fft.ifft2(torch.fft.ifftshift(fft * mask)).real.clip(0, 1)
-        return fft
-    def create_mask(self,size,a,b):
-        assert a < b, " a < b"
-        mask = torch.zeros(size)
-        h, w = size[0],size[1] # height and width
-        cy, cx = h // 2, w // 2  # center y, center x
-        # mask = torch.zeros_like(fft)
-        
-        # center = h // 2
-        half_b = a // 2
-        half_a = b // 2
-        
-        # Set values within the b*b square to 0
-        mask[:,cx - half_b:cx + half_b + b % 2, cy - half_b:cy + half_b + b % 2] = 0
-        
-        # Set values within the a*a square to 1
-        mask[:,cx - half_a:cx + half_a + a % 2, cy - half_a:cy + half_a + a % 2] = 1
-        return mask
-    def bandpass_filter(bx, mask):
-        # assert a,b #"cutoff must be in [0, 1]"
-        fft = torch.fft.fftshift(torch.fft.fft2(bx))
-       
-        
-        # h, w = fft.shape[-2:]  # height and width
-        # cy, cx = h // 2, w // 2  # center y, center x
-        # mask = torch.zeros_like(fft)
-        
-        # # center = h // 2
-        # half_b = a // 2
-        # half_a = b // 2
-        
-        # # Set values within the b*b square to 0
-        # mask[:,cx - half_b:cx + half_b + b % 2, cy - half_b:cy + half_b + b % 2] = 0
-        
-        # # Set values within the a*a square to 1
-        # mask[:,cx - half_a:cx + half_a + a % 2, cy - half_a:cy + half_a + a % 2] = 1
-
-        fft = torch.fft.ifft2(torch.fft.ifftshift(fft * mask)).real.clip(0, 1)
-        return fft
 
     def create_transformations(self, mode, normalize=True):
         """
@@ -202,28 +135,9 @@ class TrainingConfigParser:
                             f'{transform} is no valid transformation. Please write the type exactly as the Torchvision class'
                         )
                     else:
-                        if transform=="RandomErasing":
-                            if normalize:
-                                transformation_list.append(get_normalization())
-                                normalize = False
-                        if transform=="partial":
-                            if normalize:
-                                transformation_list.append(get_normalization())
-                                normalize = False
-                            print(args["cutoff_freq"], args["lowpass"])
-                            transformation_list.append(partial(self.bandpass_filter, cutoff_freq_range=args["cutoff_freq"], lowpass=args["lowpass"]))
-                        if transform=="cutOffBand":
-                            if normalize:
-                                transformation_list.append(get_normalization())
-                                normalize = False
-                            
-                            print(args["cutoff_freq"], args["lowpass"])
-                            mask=self.create_mask(args["cutoff_freq"][0],args["cutoff_freq"][1])
-                            transformation_list.append(partial(self.bandpass_filter, cutoff_freq_range=args["cutoff_freq"], lowpass=args["lowpass"]))
-                        else:
-                            transformation_class = getattr(T, transform)
-                            transformation_list.append(
-                                transformation_class(**args))
+                        transformation_class = getattr(T, transform)
+                        transformation_list.append(
+                            transformation_class(**args))
 
         elif mode == 'test' and 'celeba' in dataset_name:
             if isinstance(image_size, list):

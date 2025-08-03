@@ -17,7 +17,7 @@ class CelebA1000(Dataset):
                  train,
                  split_seed=42,
                  transform=None,
-                 root='/mnt/ssd/ngocntb/Downloads/celeba_224x224',
+                 root='data/celeba',
                  download: bool = False):
         # Load default CelebA dataset
         celeba = CustomCelebA(root=root,

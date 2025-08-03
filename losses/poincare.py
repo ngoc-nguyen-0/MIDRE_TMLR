@@ -2,9 +2,6 @@ import torch
 
 
 def poincare_loss(outputs, targets, xi=1e-4):
-
-    # print('outputs',outputs.shape, targets.shape)
-    # exit()
     # Normalize logits
     u = outputs / torch.norm(outputs, p=1, dim=-1).unsqueeze(1)
     # Create one-hot encoded target vector

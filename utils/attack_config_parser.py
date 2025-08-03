@@ -28,17 +28,7 @@ class AttackConfigParser:
             config = self._config['target_model']
             model = Classifier(num_classes=config['num_classes'],
                                architecture=config['architecture'])
-            print("Loading state dict from ...", config['weights'])
-
-            # model.load_state_dict(torch.load(config['weights']),strict=True)
-
-            try: 
-                state_dict = torch.load(config['weights'])['model_state_dict']
-                for key in list(state_dict.keys()):
-                    state_dict[key.replace('._orig_mod', '')] = state_dict.pop(key)
-                model.load_state_dict(state_dict, strict=True)
-            except:
-                model.load_state_dict(torch.load(config['weights']))
+            model.load_state_dict(torch.load(config['weights']))
             model.wandb_name = None
         else:
             raise RuntimeError('No target model stated in the config file.')
@@ -76,7 +66,6 @@ class AttackConfigParser:
             config = self._config['attack']['optimizer']
 
         optimizer_config = self._config['attack']['optimizer']
-        print('optimizer_config',optimizer_config)
         for optimizer_type, args in optimizer_config.items():
             if not hasattr(optim, optimizer_type):
                 raise Exception(
@@ -93,7 +82,6 @@ class AttackConfigParser:
             return None
 
         scheduler_config = self._config['attack']['lr_scheduler']
-        # print('scheduler_config',scheduler_config)
         for scheduler_type, args in scheduler_config.items():
             if not hasattr(optim.lr_scheduler, scheduler_type):
                 raise Exception(

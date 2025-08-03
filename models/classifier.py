@@ -10,13 +10,13 @@ import torch.nn as nn
 import wandb
 from metrics.accuracy import Accuracy
 from torch.utils.data import DataLoader
-from torchvision.models import densenet, inception, resnet, maxvit
+from torchvision.models import densenet, inception, resnet
 from torchvision.transforms import (ColorJitter, RandomCrop,
                                     RandomHorizontalFlip, Resize)
 from tqdm import tqdm
 
 from models.base_model import BaseModel
-from utils.stylegan import save_images
+
 
 class Classifier(BaseModel):
 
@@ -147,32 +147,7 @@ class Classifier(BaseModel):
                 # exchange the last layer to match the desired numbers of classes
                 model.fc = nn.Linear(model.fc.in_features, self.num_classes)
             return model
-        elif 'vit' in architecture:
-            if architecture == 'maxvit':
-                model = maxvit.maxvit_t(pretrained=pretrained)
-                # print('model',model)
-                if self.num_classes != model.classifier[5].out_features:
-                    # exchange the last layer to match the desired numbers of classes
-                    model.classifier[5] = nn.Linear(model.classifier[5].in_features, self.num_classes)
-                # print('model',model)
-                # exit()
-                # for name, param in model.named_parameters():
-                #     if "blocks.3" in name:
-                #         break
-                #     param.requires_grad = False
-                # total_params = sum(p.numel() for p in model.parameters())
-                # num_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-                # print(f"Number of Trainable Params: {num_trainable_params}")
-                # print(f"Total number of Params: {total_params}")
-                # print(f"Ratio: {round(num_trainable_params/total_params, 4)}")
-                # exit()
-                # elif architecture == 'maxvit_skip':
-                #         model = maxvit.maxvit_t(pretrained=pretrained, skip=self.skip)
-                # elif architecture == 'swin_vit':
-                #         model = swin_transformer.swin_b(pretrained=pretrained)
-                # elif architecture == 'vit':
-                #         model = vision_transformer.vit_b_16(pretrained=pretrained)
-                return model
+
         elif 'vit' in architecture:
             if architecture == 'vitb16':
                 model = timm.create_model('vit_base_patch16_224',
@@ -313,30 +288,13 @@ class Classifier(BaseModel):
                 ls_alpha = ls_scheduler(epoch)
                 criterion.label_smoothing = ls_alpha
             
-            ############3 Uncomment if EE rebuttal
-            # count = 0
-            # rate = 0.5
-            # max_len = rate * len(training_data)/batch_size
-            # print(max_len,len(training_data))
-            # exit()
-
-            count = 0
             for inputs, labels in tqdm(trainloader,
                                        desc='training',
                                        leave=False,
                                        file=sys.stdout):
-                ############3 Uncomment if EE rebuttal
-                count+=1
-                # if count > max_len:
-                #     break
-                # print('count',count)
                 inputs, labels = inputs.to(self.device,
                                            non_blocking=True), labels.to(
                                                self.device, non_blocking=True)
-                
-                if count< 100:
-                    save_images(inputs,'./test_multiples_patches/', f'{count}')
-                
                 optimizer.zero_grad()
                 model_output = self.forward(inputs)
                 aux_loss = torch.tensor(0.0, device=self.device)
@@ -362,20 +320,6 @@ class Classifier(BaseModel):
 
                 metric_train.update(model_output, labels)
 
-            test_metric, test_loss = None, None
-            if test_data:
-                test_metric, test_loss = self.evaluate(
-                    test_data,
-                    batch_size,
-                    metric,
-                    criterion,
-                    dataloader_num_workers=dataloader_num_workers)
-                
-                print(
-                    f'Epoch {epoch} Test {metric_train.name}: {test_metric:.2%} \t Test Loss: {test_loss:.4f} \n'
-                )
-
-
             print(
                 f'Training {metric_train.name}:   {metric_train.compute_metric():.2%}',
                 f'\t Epoch total loss: {running_total_loss / len(training_data):.4f}',
@@ -391,12 +335,9 @@ class Classifier(BaseModel):
                         running_total_loss / len(training_data),
                         'Learning Rate':
                         optimizer.param_groups[0]['lr'],
-                        'Test acc':
-                        test_metric,
-                        'Test Loss':
-                        test_loss,
                     },
                     step=epoch)
+
             # Validation
             if validation_data:
                 self.eval()
