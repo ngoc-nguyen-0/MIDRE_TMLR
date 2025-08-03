@@ -93,7 +93,7 @@ python attack.py -c=configs/attacking/FaceScrub_FFHQ_resnet18_midre.yml
 
 Results and metrics are logged to WandB for convenient tracking and comparison.
 
-## Pretrained model Attacks
+## Our pre-trained defense models 
 
 Our pre-trained model can be downloaded at [FaceScrub](https://github.com/ngoc-nguyen-0/MIDRE_TMLR/releases/)
 
