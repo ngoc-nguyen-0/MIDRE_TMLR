@@ -70,9 +70,7 @@ Make sure that the following structure is kept:
 
 ## Train the Defense Models
 We provide an example configuration file with detailed explanations at:
-```configs/training/targets/ResNet18_FaceScrub_midre_0.4.yaml```
-
-You can customize the training behavior by adjusting parameters such as the ```scale``` value in the ```RandomErasing``` section.
+```configs/training/targets/ResNet18_FaceScrub_midre_0.4.yaml```. You can customize the training by adjusting parameters such as the ```scale``` value in the ```RandomErasing``` section.
 
 Once the configuration file is ready, start the training process using the following command:
 
