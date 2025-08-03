@@ -68,27 +68,32 @@ Make sure that the following structure is kept:
         ├── train_data.mat
         └── train_list.mat
 
-## Train Target Models
+## Train the Defense Models
+We provide an example configuration file with detailed explanations at:
+```configs/training/targets/ResNet18_FaceScrub_midre_0.4.yaml```
 
-To define the model and training configuration, you need to create a configuration file. We provide a example configuration with explanations at ```configs/training/targets/ResNet18_FaceScrub_midre.yaml```. To train the target models accordingly to our paper, we provide a training configuration for each dataset. You only need to adjust the architecture used and the Weights & Biases configuration - all other parameters are identical for each target dataset. Only the batch size has to be adjusted for larger models.
+You can customize the training behavior by adjusting parameters such as the ```scale``` value in the ```RandomErasing``` section.
 
-After a training configuration file has been created, run the following command to start the training with the specified configuration:
+Once the configuration file is ready, start the training process using the following command:
+
 ```bash
 python train_model.py -c=configs/training/targets/ResNet18_FaceScrub_midre.yaml
 ```
-After the optimization is performed, the results are automatically evaluated. All results together with the initial, optimized, and selected latent vectors are stored at WandB.
+After the optimization completes, the model is automatically evaluated. All outputs are logged to WandB.
 
-## Perform Attacks
-To perform our attacks, prepare an attack configuration file including the WandB run paths of the target and evaluation models. We provide an example configuration with explanations at ```configs/attacking/FaceScrub_FFHQ_resnet18_midre.yml```. We further provide configuration files to reproduce the various attack results stated in our paper. You only need to adjust the run paths for each dataset combination, and possibly the batch size.
+## Evaluate the effectiveness of MIDRE
 
-After an attack configuration file has been created, run the following command to start the attack with the specified configuration:
+To evaluate the effectiveness of our defense, we provide [PPA attack](https://github.com/LukasStruppek/Plug-and-Play-Attacks). An example configuration file with detailed explanations can be found at:
+```configs/attacking/FaceScrub_FFHQ_resnet18_midre.yml```.
+Make sure to update ```weights``` in the configuration to the directory of your trained defense model.
+
+
 ```bash
 python attack.py -c=configs/attacking/FaceScrub_FFHQ_resnet18_midre.yml
 
 ```
 
-All results including the metrics will be stored at WandB for easy tracking and comparison.
-
+Results and metrics are logged to WandB for convenient tracking and comparison.
 
 ## Pretrained model Attacks
 
@@ -111,7 +116,7 @@ url={https://openreview.net/forum?id=S9CwKnPHaO}
 ## Implementation Credits
 Some of our implementations rely on other repos. We want to thank the authors for making their code publicly available. 
 For license details, refer to the corresponding files in our repo. For more details on the specific functionality, please visit the corresponding repos.
-- PPA: https://github.com/LukasStruppek/Plug-and-Play-Attacks/tree/master
+- PPA: https://github.com/LukasStruppek/Plug-and-Play-Attacks
 - FID Score: https://github.com/mseitzer/pytorch-fid
 - Stanford Dogs Dataset Class: https://github.com/zrsmithson/Stanford-dogs
 - FaceNet: https://github.com/timesler/facenet-pytorch
