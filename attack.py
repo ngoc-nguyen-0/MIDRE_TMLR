@@ -85,9 +85,27 @@ def main():
     batch_size = config.attack['batch_size'] * torch.cuda.device_count()
     targets = config.create_target_vector()
 
-    # Create initial style vectors
-    w, w_init, x, V = create_initial_vectors(config, G, target_model, targets,
-                                             device)
+    optimized_w_path_selected = f"{results_fol}/{config.wandb['wandb_init_args']['name']}/optimized_w_iter_0.pt"
+
+    if os.path.exists(optimized_w_path_selected) == False:
+        targets = config.create_target_vector()
+
+        # Create initial style vectors
+        w, w_init, x, V = create_initial_vectors(
+            config, G, target_model, targets, device)
+        
+        #Log initial vectors
+        if config.logging:
+            os.mkdir(f"{results_fol}/{config.wandb['wandb_init_args']['name']}")
+            torch.save({'w':w.detach(),'targets':targets.detach()}, optimized_w_path_selected)
+    else:
+        print('loading-----')
+        data_ = torch.load(optimized_w_path_selected)
+        targets = data_['targets']
+        w = data_['w']
+        del data_
+
+
     del G
 
     # Initialize wandb logging
@@ -140,23 +158,32 @@ def main():
     w_optimized = []
 
     # Prepare batches for attack
-    for i in range(math.ceil(w.shape[0] / batch_size)):
+    for i in range(args.start_id,math.ceil(w.shape[0] / batch_size)):
+        optimized_w_path = f"{results_fol}/{config.wandb['wandb_init_args']['name']}/optimized_w_batch_{i}.pt"
+
         w_batch = w[i * batch_size:(i + 1) * batch_size].cuda()
         targets_batch = targets[i * batch_size:(i + 1) * batch_size].cuda()
         print(
             f'\nOptimizing batch {i+1} of {math.ceil(w.shape[0] / batch_size)} targeting classes {set(targets_batch.cpu().tolist())}.'
         )
+        if os.path.exists(optimized_w_path) == False: #False
+            # Run attack iteration
+            torch.cuda.empty_cache()
+            w_batch_optimized = optimization.optimize(w_batch, targets_batch,
+                                                    num_epochs).detach().cpu()
+            w_batch_optimized = w_batch_optimized.detach().cpu()
+            if rtpt:
+                num_batches = math.ceil(w.shape[0] / batch_size)
+                rtpt.step(subtitle=f'batch {i+1} of {num_batches}')
+            if config.logging:                
+                torch.save(w_batch_optimized.detach(), optimized_w_path)
+                wandb.save(optimized_w_path)
+        else:
+            print(
+                f'\nLoading batch {i+1} of {math.ceil(w.shape[0] / batch_size)} targeting classes {set(targets_batch.cpu().tolist())}.'
+            )
+            w_batch_optimized = torch.load(optimized_w_path)
 
-        # Run attack iteration
-        torch.cuda.empty_cache()
-        w_batch_optimized = optimization.optimize(w_batch, targets_batch,
-                                                  num_epochs).detach().cpu()
-
-        if rtpt:
-            num_batches = math.ceil(w.shape[0] / batch_size)
-            rtpt.step(subtitle=f'batch {i+1} of {num_batches}')
-
-        # Collect optimized style vectors
         w_optimized.append(w_batch_optimized)
 
     # Concatenate optimized style vectors
@@ -263,64 +290,6 @@ def main():
     except Exception:
         print(traceback.format_exc())
 
-    ####################################
-    #    FID Score and GAN Metrics     #
-    ####################################
-
-    fid_score = None
-    precision, recall = None, None
-    density, coverage = None, None
-    try:
-        # set transformations
-        crop_size = config.attack_center_crop
-        target_transform = T.Compose([
-            T.ToTensor(),
-            T.Resize((299, 299), antialias=True),
-            T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-        ])
-
-        # create datasets
-        attack_dataset = TensorDataset(final_w, final_targets)
-        attack_dataset.targets = final_targets
-        training_dataset = create_target_dataset(target_dataset,
-                                                 target_transform)
-        training_dataset = ClassSubset(
-            training_dataset,
-            target_classes=torch.unique(final_targets).cpu().tolist())
-
-        # compute FID score
-        fid_evaluation = FID_Score(training_dataset,
-                                   attack_dataset,
-                                   device=device,
-                                   crop_size=crop_size,
-                                   generator=synthesis,
-                                   batch_size=batch_size * 3,
-                                   dims=2048,
-                                   num_workers=8,
-                                   gpu_devices=gpu_devices)
-        fid_score = fid_evaluation.compute_fid(rtpt)
-        print(
-            f'FID score computed on {final_w.shape[0]} attack samples and {config.dataset}: {fid_score:.4f}'
-        )
-
-        # compute precision, recall, density, coverage
-        prdc = PRCD(training_dataset,
-                    attack_dataset,
-                    device=device,
-                    crop_size=crop_size,
-                    generator=synthesis,
-                    batch_size=batch_size * 3,
-                    dims=2048,
-                    num_workers=8,
-                    gpu_devices=gpu_devices)
-        precision, recall, density, coverage = prdc.compute_metric(
-            num_classes=config.num_classes, k=3, rtpt=rtpt)
-        print(
-            f' Precision: {precision:.4f}, Recall: {recall:.4f}, Density: {density:.4f}, Coverage: {coverage:.4f}'
-        )
-
-    except Exception:
-        print(traceback.format_exc())
 
     ####################################
     #         Feature Distance         #
@@ -476,6 +445,10 @@ def create_parser():
                         action='store_false',
                         dest="rtpt",
                         help='Disable RTPT')
+    parser.add_argument('--start_id',
+                        default=0,
+                        type=int
+                        )                       
     return parser
 
 

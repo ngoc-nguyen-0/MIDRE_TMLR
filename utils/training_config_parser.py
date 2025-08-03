@@ -135,6 +135,10 @@ class TrainingConfigParser:
                             f'{transform} is no valid transformation. Please write the type exactly as the Torchvision class'
                         )
                     else:
+                        if transform=="RandomErasing":
+                            if normalize:
+                                transformation_list.append(get_normalization())
+                                normalize = False
                         transformation_class = getattr(T, transform)
                         transformation_list.append(
                             transformation_class(**args))

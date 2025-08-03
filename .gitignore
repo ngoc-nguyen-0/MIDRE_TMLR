@@ -1,0 +1,4 @@
+results/
+wandb/
+stylegan2-ada-pytorch/
+trained_models/

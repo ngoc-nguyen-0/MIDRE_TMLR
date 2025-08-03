@@ -12,7 +12,7 @@ class FaceScrub(Dataset):
                  split_seed=42,
                  transform=None,
                  cropped=True,
-                 root='data/facescrub'):
+                 root='../facescrub'):
 
         if group == 'actors':
             if cropped:
