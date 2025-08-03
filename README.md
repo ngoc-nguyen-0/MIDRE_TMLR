@@ -10,7 +10,7 @@
 
 ## Model Inversion Defense
   <center>
-  <img src="images/MIDRE_2.jpg" alt="Attack Pipeline"  height=160>
+  <img src="images/MIDRE_2.png" alt="Defense Pipeline"  height=160>
   </center>
 
 # Setup and Run Attacks
