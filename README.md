@@ -86,6 +86,11 @@ python attack.py -c=configs/attacking/FaceScrub_FFHQ_resnet18_midre.yml
 
 All results including the metrics will be stored at WandB for easy tracking and comparison.
 
+
+## Pretrained model Attacks
+
+Our pre-trained model can be downloaded at [FaceScrub](https://github.com/ngoc-nguyen-0/MIDRE_TMLR/releases/)
+
 ## Citation
 If you build upon our work, please don't forget to cite us.
 ```
