@@ -7,6 +7,7 @@ from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 
+import os
 import numpy as np
 import torch
 import torchvision.transforms as T
@@ -61,7 +62,10 @@ def main():
                 return key
 
         idx_to_class = KeyDict()
-
+    try:
+        results_fol = config.wandb['folder']
+    except:
+        results_fol = 'results'
     # Load pre-trained StyleGan2 components
     G = load_generator(config.stylegan_model)
     D = load_discrimator(config.stylegan_model)
@@ -185,7 +189,7 @@ def main():
             w_batch_optimized = torch.load(optimized_w_path)
 
         w_optimized.append(w_batch_optimized)
-
+    
     # Concatenate optimized style vectors
     w_optimized_unselected = torch.cat(w_optimized, dim=0)
     torch.cuda.empty_cache()
@@ -425,7 +429,7 @@ def main():
                                   target_dataset,
                                   img_size=160,
                                   seed=config.seed)
-
+        fid_score = -1
         # Final logging
         final_wandb_logging(avg_correct_conf, avg_total_conf, acc_top1,
                             acc_top5, avg_dist_facenet, avg_dist_inception,

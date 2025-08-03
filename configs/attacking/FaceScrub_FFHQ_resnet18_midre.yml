@@ -2,7 +2,7 @@
     target_model:
       architecture: resnet18 # architecture of target model
       num_classes: 530 # number of output neurons
-      weights: ./results/ResNet18_FaceScrub_midre/Classifier_0.9999_no_val.pth # link to weight file
+      weights: results/resnet18_20250803_161733/Classifier_0.9981_no_val.pth # link to weight file
     evaluation_model:
       architecture: inception-v3 # architecture of evaluation model
       num_classes: 530 # number of output neurons

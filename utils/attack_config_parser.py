@@ -28,7 +28,13 @@ class AttackConfigParser:
             config = self._config['target_model']
             model = Classifier(num_classes=config['num_classes'],
                                architecture=config['architecture'])
-            model.load_state_dict(torch.load(config['weights']))
+            try: 
+                state_dict = torch.load(config['weights'])['model_state_dict']
+                for key in list(state_dict.keys()):
+                    state_dict[key.replace('._orig_mod', '')] = state_dict.pop(key)
+                model.load_state_dict(state_dict, strict=True)
+            except:
+                model.load_state_dict(torch.load(config['weights']))
             model.wandb_name = None
         else:
             raise RuntimeError('No target model stated in the config file.')
