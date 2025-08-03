@@ -112,8 +112,7 @@ url={https://openreview.net/forum?id=S9CwKnPHaO}
 ```
 
 ## Implementation Credits
-Some of our implementations rely on other repos. We want to thank the authors for making their code publicly available. 
-For license details, refer to the corresponding files in our repo. For more details on the specific functionality, please visit the corresponding repos.
+Some components of our implementation build upon existing public repositories. We sincerely thank the authors for making their code available:
 - PPA: https://github.com/LukasStruppek/Plug-and-Play-Attacks
 - FID Score: https://github.com/mseitzer/pytorch-fid
 - Stanford Dogs Dataset Class: https://github.com/zrsmithson/Stanford-dogs
