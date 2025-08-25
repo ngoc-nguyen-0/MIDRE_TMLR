@@ -100,13 +100,12 @@ Our pre-trained model can be downloaded at [FaceScrub](https://github.com/ngoc-n
 ## Citation
 If you build upon our work, please don't forget to cite us.
 ```
-@article{
-Tran2025random,
+@misc{
+tran2024random,
 title={Random Erasing vs. Model Inversion: A Promising Defense or a False Hope?},
-author={Viet-Hung Tran, Ngoc-Bao Nguyen, Son T. Mai, Hans Vandierendonck, Ira Assent, Alex Kot, Ngai-Man Cheung},
-journal={Accepted in Transactions on Machine Learning Research (TMLR)},
-year={2025},
-url={https://openreview.net/forum?id=S9CwKnPHaO}
+author={Viet-Hung Tran and Ngoc-Bao Nguyen and Son T. Mai and Hans Vandierendonck and Ira Assent and Alex Kot and Ngai-man Cheung},
+year={2024},
+url={https://openreview.net/forum?id=vikwIayXOx}
 }
 
 ```
