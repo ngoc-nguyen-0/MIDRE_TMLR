@@ -2,6 +2,8 @@
 Viet-Hung Tran, Ngoc-Bao Nguyen, Son T. Mai, Hans Vandierendonck, Ira Assent, Alex Kot, Ngai-Man Cheung
 
 (*) The first two authors contributed equally.
+
+ **[Featured Certification "awarded to papers that are very high quality", J2C Certification invited for ICML presentation.]**
   <center>
   <img src="images/figure2.jpg" alt="PPA Examples"  height=1000>
   </center>
